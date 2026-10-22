@@ -62,16 +62,18 @@ df["Participacion_Activo_%"] = np.where(df["Tipo"] == "Activo", (df["Anio_Actual
 
 # 3. Módulo de Alertas de Auditoría y Triángulo del Fraude (NIA 240 / NIA 520)
 def evaluar_riesgo(row):
-    # Criterios analíticos de alerta automatizada
-    if row["Nombre_Cuenta"].str.contains("Cuentas por Cobrar", case=False) and row["Variacion_Porcentual"] > 30:
+    nombre_cta = str(row["Nombre_Cuenta"])
+    variacion = float(row["Variacion_Porcentual"])
+    
+    if "Cuentas por Cobrar" in nombre_cta and variacion > 30:
         return "🚨 ALTA (Presión de metas / Posible colusión o ventas ficticias)"
-    elif row["Nombre_Cuenta"].str.contains("Efectivo", case=False) and row["Variacion_Porcentual"] < -20:
+    elif "Efectivo" in nombre_cta and variacion < -20:
         return "⚠️ MEDIA (Riesgo de faltantes / Jineteo de fondos)"
-    elif row["Nombre_Cuenta"].str.contains("Cuentas por Pagar", case=False) and row["Variacion_Porcentual"] > 50:
+    elif "Cuentas por Pagar" in nombre_cta and variacion > 50:
         return "🚨 ALTA (Pasivos omitidos / Corte de operaciones deficiente)"
-    elif row["Variacion_Porcentual"] > 25:
+    elif variacion > 25:
         return "⚠️ MEDIA (Variación atípica significativa - NIA 520)"
-    elif row["Variacion_Porcentual"] < -25:
+    elif variacion < -25:
         return "⚠️ MEDIA (Reducción abrupta inusual)"
     else:
         return "✅ Normal"
